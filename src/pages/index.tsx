@@ -26,12 +26,15 @@ const geistMono = Geist_Mono({
 export default function Home() {
   const parsedData = useRef<IPRecord[]>([]);
   const [fileName, setFileName] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
   const [maxUA, setMaxUA] = useState<number>(0);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
+    setLoading(true);
     acceptedFiles[0].text().then((data) => {
       parsedData.current = parseCSV(data);
       setFileName(acceptedFiles[0].name);
+      setLoading(false);
     });
   }, []);
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -92,7 +95,13 @@ export default function Home() {
             </>
           )}
 
-          {!fileName && (
+          {loading && 
+          <>
+          Wait a minute...
+          </>
+          }
+
+          {!loading && parsedData.current.length === 0 && (
             <div
               className={`${styles.dropzone} ${
                 isDragActive ? styles.over : ''
