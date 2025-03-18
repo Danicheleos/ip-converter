@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Address6 } from 'ip-address';
+import { Address4, Address6 } from 'ip-address';
 import { ipToBigInt } from './ip.service';
 
 export interface IPRecord {
@@ -10,9 +10,10 @@ export function parseCSV(rawCSV: string): IPRecord[] {
   const csv = rawCSV;
 
   const rows = csv.split('\n');
-  const headers = rows[0].split(';');
+  const separator = ',';
+  const headers = rows[0].split(separator);
 
-  const regex = new RegExp(`\\s*(")?(.*?)\\1\\s*(?:;|$)`, 'gs');
+  const regex = new RegExp(`\\s*(")?(.*?)\\1\\s*(?:${separator}|$)`, 'gs');
 
   const match = (line: any) =>
     [...line.matchAll(regex)].map((m) => m[2]).slice(0, -1);
@@ -30,7 +31,7 @@ export function parseCSV(rawCSV: string): IPRecord[] {
   });
 
   const sortedIps = result
-    .filter((value) => value.IP)
+    .filter((value) => Address4.isValid(value.IP))
     .sort((a, b) => (ipToBigInt(a.IP) < ipToBigInt(b.IP) ? -1 : 1));
 
   return sortedIps;
