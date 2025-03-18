@@ -28,7 +28,9 @@ export function rangeToCIDR(startIp: string, endIp: string, maxBits: number): st
   }
   
   const prefixLength = maxBits - bitMask;
-  return bigIntToIP(start, maxBits) + "/" + prefixLength;
+  const ip = bigIntToIP(start, maxBits).split('.');
+  ip[ip.length - 1] = '0';
+  return ip.join('.') + "/" + Math.min(prefixLength, 24);
 }
 
 // Convert IP to BigInt

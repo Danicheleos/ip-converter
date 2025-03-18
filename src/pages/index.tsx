@@ -46,13 +46,17 @@ export default function Home() {
     console.log(parsedData.current);
     saveFile(
       fileName,
-      parsedData.current
-        .map((record) => ipRangeToCIDR(record.IP, record.IP))
-        .join('\n')
+      Array.from(
+        new Set(
+          parsedData.current.map((record) =>
+            ipRangeToCIDR(record.IP, record.IP)
+          )
+        )
+      ).join('\n')
     );
   };
 
-  const onGetCIDRByPairs = () => {
+  const onGetCIDRWithPairs = () => {
     const filteredPairs = filterWithPairs(parsedData.current);
     const result = groupIPsToCIDR(filteredPairs);
     saveFile(fileName, result.join('\n'));
@@ -121,14 +125,18 @@ export default function Home() {
               <button onClick={onGetCIDR}>
                 <span>Get CIDR</span>
               </button>
-              <button onClick={onGetCIDRByPairs}>
+              <button onClick={onGetCIDRWithPairs}>
                 <span>Get CIDR by pairs</span>
               </button>
               <button onClick={onGetIpsWithUniqUA}>
                 <span>Get IPs with uniq UA</span>
               </button>
               <div className='input-wrapper'>
-                <input value={maxUA} onChange={(e) => setMaxUA(+e.target.value)} type='number' placeholder='min UA value'></input>
+                <input
+                  value={maxUA}
+                  onChange={(e) => setMaxUA(+e.target.value)}
+                  type='number'
+                  placeholder='min UA value'></input>
                 <button onClick={onGetIpsWithMultipleUA}>
                   <span>Get IPs with multiple UA</span>
                 </button>
