@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Address6 } from 'ip-address';
-import { ipToBigInt } from './ip.sevice';
+import { ipToBigInt } from './ip.service';
 
 export interface IPRecord {
   [key: string]: string;

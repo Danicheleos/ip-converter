@@ -10,8 +10,8 @@ import {
   IPRecord,
   parseCSV,
   saveFile,
-} from './services/parser.service';
-import { groupIPsToCIDR, ipRangeToCIDR } from './services/ip.sevice';
+} from '../services/parser.service';
+import { groupIPsToCIDR, ipRangeToCIDR } from '../services/ip.service';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
