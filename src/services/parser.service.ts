@@ -7,9 +7,7 @@ export interface IPRecord {
 }
 
 export function parseCSV(rawCSV: string): IPRecord[] {
-  const csv = rawCSV;
-
-  const rows = csv.split('\n');
+  const rows = rawCSV.split('\n');
   const separator = ',';
   const headers = rows[0].split(separator);
 
@@ -18,22 +16,23 @@ export function parseCSV(rawCSV: string): IPRecord[] {
   const match = (line: any) =>
     [...line.matchAll(regex)].map((m) => m[2]).slice(0, -1);
 
-  let lines = csv.split('\n');
+  let lines = rawCSV.split('\n');
   const heads = headers ?? match(lines.shift());
   lines = lines.slice(1);
 
   const result = lines.map((line) => {
     return match(line).reduce((acc, cur, i) => {
-      const val = cur.length <= 0 ? null : Number(cur) || cur;
       const key = heads[i] ?? `${i}`;
+      if (key !== 'USER_AGENT' && key !== 'IP') return acc;
+
+      const val = cur.length <= 0 ? null : Number(cur) || cur;
       return { ...acc, [key.trim()]: val };
     }, {});
   });
-
+  
   const sortedIps = result
     .filter((value) => Address4.isValid(value.IP))
     .sort((a, b) => (ipToBigInt(a.IP) < ipToBigInt(b.IP) ? -1 : 1));
-
   return sortedIps;
 }
 
@@ -51,10 +50,10 @@ export function filterWithUniqUA(ips: IPRecord[]): string[] {
   ips.forEach((ip) => {
     const existedValue = ipMap.get(ip.IP);
     if (existedValue) {
-      existedValue.add(ip['User Agent']);
+      existedValue.add(ip['USER_AGENT']);
       ipMap.set(ip.IP, existedValue);
     } else {
-      ipMap.set(ip.IP, new Set([ip['User Agent']]));
+      ipMap.set(ip.IP, new Set([ip['USER_AGENT']]));
     }
   });
   return Array.from(ipMap.keys()).filter((key) => ipMap.get(key)?.size === 1);
@@ -65,10 +64,10 @@ export function filterWithMultipleUA(ips: IPRecord[], minUA: number): string[] {
   ips.forEach((ip) => {
     const existedValue = ipMap.get(ip.IP);
     if (existedValue) {
-      existedValue.add(ip['User Agent']);
+      existedValue.add(ip['USER_AGENT']);
       ipMap.set(ip.IP, existedValue);
     } else {
-      ipMap.set(ip.IP, new Set([ip['User Agent']]));
+      ipMap.set(ip.IP, new Set([ip['USER_AGENT']]));
     }
   });
 
@@ -109,8 +108,8 @@ export function filterWithPairs(ips: IPRecord[]): IPRecord[] {
 
 export function saveFile(fileName: string, text: string): void {
   const hiddenElement = document.createElement('a');
-  hiddenElement.href = 'data:attachment/text,' + encodeURI(text);
+  hiddenElement.href = 'data:attachment/text,' + encodeURI('IP\n'+text);
   hiddenElement.target = '_blank';
-  hiddenElement.download = fileName + '_result.txt';
+  hiddenElement.download = fileName.split('.')[0] + '_result.csv';
   hiddenElement.click();
 }
