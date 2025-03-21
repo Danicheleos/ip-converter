@@ -1,7 +1,7 @@
 'use client';
 import Head from 'next/head';
 import { Geist, Geist_Mono } from 'next/font/google';
-import styles from '@/styles/Home.module.scss';
+import styles from '../styles/Home.module.scss';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import {
@@ -12,7 +12,6 @@ import {
   saveFile,
 } from '../services/parser.service';
 import { groupIPsToCIDR, ipRangeToCIDR } from '../services/ip.service';
-import Worker from 'web-worker';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
