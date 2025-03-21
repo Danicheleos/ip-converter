@@ -1,53 +1,32 @@
-'use client';
-import Head from 'next/head';
-import { Geist, Geist_Mono } from 'next/font/google';
-import styles from '../styles/Home.module.scss';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import {
-  filterWithMultipleUA,
-  filterWithPairs,
-  filterWithUniqUA,
-  IPRecord,
-  saveFile,
-} from '../services/parser.service';
-import { groupIPsToCIDR, ipRangeToCIDR } from '../services/ip.service';
+import { ipRangeToCIDR, groupIPsToCIDR } from './services/ip.service';
+import { IPRecord, saveFile, filterWithPairs, filterWithUniqUA, filterWithMultipleUA } from './services/parser.service';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-});
-
-export default function Home() {
+const App: React.FC = () => {
   const parsedData = useRef<IPRecord[]>([]);
   const progress = useRef<number>(0);
-  const workerRef = useRef<Worker>(null);
+  const workerRef = useRef<Worker | null>(null);
   const totalSize = useRef<number>(0);
   const [fileName, setFileName] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [maxUA, setMaxUA] = useState<number>(0);
 
-  workerRef.current = new Worker(new URL('./worker.ts', import.meta.url));
-  workerRef.current.onmessage = (e) => {
-    parsedData.current = [...parsedData.current, ...e.data.data];
-    progress.current = e.data.size + progress.current;
-    const percentage = Math.round((progress.current / totalSize.current) * 100);
-    const progressBar = document.getElementById('progress-bar');
-    if (progressBar) {
-      progressBar.style.width = percentage.toString() + '%';
-    }
-    if (percentage === 100) {
-      console.log('complete')
-      setLoading(false);
-    }
-  };
-  
   useEffect(() => {
+    workerRef.current = new Worker(new URL('./worker.ts', import.meta.url), {type: 'module' });
+    workerRef.current.onmessage = (e) => {
+      parsedData.current = [...parsedData.current, ...e.data.data];
+      progress.current = e.data.size + progress.current;
+      const percentage = Math.round((progress.current / totalSize.current) * 100);
+      const progressBar = document.getElementById('progress-bar');
+      if (progressBar) {
+        progressBar.style.width = percentage.toString() + '%';
+      }
+      if (percentage === 100) {
+        console.log('complete')
+        setLoading(false);
+      }
+    };
 
     return () => {
       workerRef.current?.terminate();
@@ -144,21 +123,15 @@ export default function Home() {
 
   return (
     <>
-      <Head>
-        <title>IP Converter</title>
-        <meta name='description' content='IP Converter' />
-        <meta name='viewport' content='width=device-width, initial-scale=1' />
-        <link rel='icon' href='/favicon.ico' />
-      </Head>
       <div
-        className={`${styles.page} ${geistSans.variable} ${geistMono.variable}`}>
-        <main className={styles.main}>
+        className={`page variable `}>
+        <main className={'main'}>
           {fileName && (
             <>
-              <span className={styles.fileName}>{fileName}</span>
-              <span className={`${styles.fileName} ${styles.controls}`}>
+              <span className={'fileName'}>{fileName}</span>
+              <span className={`${'fileName'} ${'controls'}`}>
                 {!loading && 
-                <button onClick={onReset} className={styles.controls}>
+                <button onClick={onReset} className={'controls'}>
                   <span>RESET</span>
                 </button>
                 }
@@ -173,8 +146,8 @@ export default function Home() {
           </>}
           {!loading && parsedData.current.length === 0 && (
             <div
-              className={`${styles.dropzone} ${
-                isDragActive ? styles.over : ''
+              className={`${'dropzone'} ${
+                isDragActive ? 'over' : ''
               }`}
               {...getRootProps()}>
               <input {...getInputProps()} />
@@ -186,8 +159,8 @@ export default function Home() {
             </div>
           )}
 
-          {parsedData.current.length > 0 && (
-            <div className={styles.controls}>
+          {parsedData.current.length > 0 && !loading && (
+            <div className={'controls'}>
               <button onClick={onGetCIDR}>
                 <span>Get CIDR</span>
               </button>
@@ -213,4 +186,6 @@ export default function Home() {
       </div>
     </>
   );
-}
+};
+
+export default App;

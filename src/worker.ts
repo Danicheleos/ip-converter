@@ -1,6 +1,4 @@
-'use client';
-
-import { parseCSV } from '../services/parser.service';
+import { parseCSV } from './services/parser.service';
 
 addEventListener('message' ,(e) => {
   const { lines, headers, separator, size } = e.data;
