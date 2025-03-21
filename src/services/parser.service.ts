@@ -6,34 +6,29 @@ export interface IPRecord {
   [key: string]: string;
 }
 
-export function parseCSV(rawCSV: string): IPRecord[] {
-  const rows = rawCSV.split('\n');
-  const separator = ',';
-  const headers = rows[0].split(separator);
-
-  const regex = new RegExp(`\\s*(")?(.*?)\\1\\s*(?:${separator}|$)`, 'gs');
-
-  const match = (line: any) =>
-    [...line.matchAll(regex)].map((m) => m[2]).slice(0, -1);
-
-  let lines = rawCSV.split('\n');
-  const heads = headers ?? match(lines.shift());
-  lines = lines.slice(1);
-
-  const result = lines.map((line) => {
-    return match(line).reduce((acc, cur, i) => {
-      const key = heads[i] ?? `${i}`;
-      if (key !== 'USER_AGENT' && key !== 'IP') return acc;
-
-      const val = cur.length <= 0 ? null : Number(cur) || cur;
-      return { ...acc, [key.trim()]: val };
-    }, {});
-  });
+export function parseCSV(lines: string[], headers: string[], separator: string): IPRecord[] {
+    
+    const regex = new RegExp(`\\s*(")?(.*?)\\1\\s*(?:${separator}|$)`, 'gs');
   
-  const sortedIps = result
-    .filter((value) => Address4.isValid(value.IP))
-    .sort((a, b) => (ipToBigInt(a.IP) < ipToBigInt(b.IP) ? -1 : 1));
-  return sortedIps;
+    const match = (line: any) => [...line.matchAll(regex)].map((m) => m[2]).slice(0, -1);
+  
+    const heads = headers ?? match(lines.shift());
+    lines = lines.slice(1);
+  
+    const result = lines.map((line) => {
+      return match(line).reduce((acc, cur, i) => {
+        const key = heads[i] ?? `${i}`;
+        if (key !== 'USER_AGENT' && key !== 'IP') return acc;
+  
+        const val = cur.length <= 0 ? null : Number(cur) || cur;
+        return { ...acc, [key.trim()]: val };
+      }, {});
+    });
+    
+    const sortedIps = result
+      .filter((value) => Address4.isValid(value.IP))
+      .sort((a, b) => (ipToBigInt(a.IP) < ipToBigInt(b.IP) ? -1 : 1));
+    return sortedIps;
 }
 
 function calculatePrefix(ip: string): string {
