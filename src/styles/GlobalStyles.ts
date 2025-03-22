@@ -52,6 +52,7 @@ nextjs-portal, next-route-announcer {
 .progress-bar-wrapper {
   width: 100%;
   min-width: 400px;
+  max-width: 800px;
   height: 10px;
   padding: 2px;
   background-color: #959595;
@@ -73,13 +74,8 @@ nextjs-portal, next-route-announcer {
   --button-primary-hover: #383838;
   --button-secondary-hover: #f2f2f2;
 
-  display: grid;
-  grid-template-rows: 20px 1fr 20px;
-  align-items: center;
-  justify-items: center;
   min-height: 100svh;
-  padding: 80px;
-  gap: 64px;
+  padding: 40px 40px;
   font-family: var(--font-geist-sans);
 }
 
@@ -184,5 +180,92 @@ nextjs-portal, next-route-announcer {
 
 .fileName {
   text-align: center;
+}
+
+.MuiTabs-list {
+  width: 100%;
+
+  .MuiTab-root {
+    color: white;
+    cursor: pointer;
+
+    &.Mui-selected {
+      color: #1976d2;
+    }
+
+    &.Mui-disabled {
+      opacity: 0.5;
+    }
+  } 
+}
+
+.result-wrapper {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  flex-wrap: no-wrap;
+  gap: 10px;
+
+  .parse-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: auto 0;
+
+    .input-container {
+      padding-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+
+      input {
+        margin: auto;
+        width: 100px;
+      }
+    }
+
+    button {
+      margin: auto;
+      width: 100%;
+    }
+  }
+
+  .right-side,
+  .left-side {
+    max-width: 40%;
+    flex: 1;
+
+    .right-side-header,
+    .left-side-header {
+      margin: 0 auto;
+    }
+
+
+    .right-side-container,
+    .left-side-container {
+      border: 1px solid gray;
+      border-radius: 10px;
+      padding: 10px;
+      height: 100%;
+    }
+
+    .preview {
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+      flex-wrap: nowrap;
+
+      .ua {
+        max-width: 50%;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+      .ip {
+        width: 50%;
+        min-width: 150px;
+      }
+    }
+  }
 }
 `;

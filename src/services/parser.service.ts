@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Address4, Address6 } from 'ip-address';
-import { ipToBigInt } from './ip.service';
+import { ipRangeToCIDR } from './ip.service';
 
 export interface IPRecord {
   [key: string]: string;
@@ -27,7 +27,6 @@ export function parseCSV(lines: string[], headers: string[], separator: string):
     
     const sortedIps = result
       .filter((value) => Address4.isValid(value.IP))
-      .sort((a, b) => (ipToBigInt(a.IP) < ipToBigInt(b.IP) ? -1 : 1));
     return sortedIps;
 }
 
@@ -75,30 +74,21 @@ export function filterWithMultipleUA(ips: IPRecord[], minUA: number): string[] {
   });
 }
 
-export function filterWithPairs(ips: IPRecord[]): IPRecord[] {
-  const pairsIps = new Array<IPRecord>();
-  let pairs = new Array<IPRecord>();
+export function filterWithPairs(ips: IPRecord[]): string[] {
+  // console.log(ips)
 
-  for (const ip of ips) {
-    if (pairs.length === 0) {
-      pairs.push(ip);
-      continue;
+  const result = ips.reduce((acc, value) => {
+    const rootPrefix = calculatePrefix(value.IP);
+    return {...acc, [rootPrefix]: [...(acc[rootPrefix] || []), value.IP]};
+  }, {} as any);
+  
+  console.log( Object.values<string[]>(result))
+  return Object.values<string[]>(result).reduce((acc, value) => {
+    if (value.length >= 2) {
+      acc.push(ipRangeToCIDR(value[0], value[0]));
     }
-    const rootPrefix = calculatePrefix(pairs[0].IP);
-    const currentPrefix = calculatePrefix(ip.IP);
-
-    if (rootPrefix === currentPrefix) {
-      pairs.push(ip);
-    } else {
-      if (pairs.length > 1) {
-        pairsIps.push(pairs[0]);
-        pairsIps.push(pairs[pairs.length - 1]);
-      }
-      pairs = [];
-    }
-  }
-
-  return pairsIps;
+    return acc;
+  }, [] as string[]);
 }
 
 export function saveFile(fileName: string, text: string): void {

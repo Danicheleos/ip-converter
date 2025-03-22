@@ -52,16 +52,3 @@ function bigIntToIP(ip: bigint, maxBits: number): string {
   }
   throw new Error('Invalid maxBits value');
 }
-
-export function groupIPsToCIDR(input: {[key: string]: string}[]): string[] {
-  const ips = input.map(entry => entry.IP);
-
-  const cidrBlocks: string[] = [];
-
-  for (let i = 1; i < ips.length; i+=2) {
-      const currentIP = ips[i - 1];
-      const nextIP = ips[i];
-      cidrBlocks.push(ipRangeToCIDR(currentIP, nextIP));
-  }
-  return cidrBlocks;
-}
