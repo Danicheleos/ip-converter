@@ -75,14 +75,12 @@ export function filterWithMultipleUA(ips: IPRecord[], minUA: number): string[] {
 }
 
 export function filterWithPairs(ips: IPRecord[]): string[] {
-  // console.log(ips)
 
   const result = ips.reduce((acc, value) => {
     const rootPrefix = calculatePrefix(value.IP);
     return {...acc, [rootPrefix]: [...(acc[rootPrefix] || []), value.IP]};
   }, {} as any);
   
-  console.log( Object.values<string[]>(result))
   return Object.values<string[]>(result).reduce((acc, value) => {
     if (value.length >= 2) {
       acc.push(ipRangeToCIDR(value[0], value[0]));
