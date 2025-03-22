@@ -2,8 +2,6 @@ import { useRef, useState, useEffect, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import {
   ipRangeToCIDR,
-  groupIPsToCIDR,
-  ipToBigInt,
 } from './services/ip.service';
 import {
   IPRecord,
