@@ -35,7 +35,7 @@ function calculatePrefix(ip: string): string {
   if (isIPv6) {
     return ip.split(':').slice(0, -1).join();
   } else {
-    return ip.split('.').slice(0, -1).join();
+    return ip.split('.').slice(0, -1).join('.');
   }
 }
 
@@ -76,17 +76,23 @@ export function filterWithMultipleUA(ips: IPRecord[], minUA: number): string[] {
 
 export function filterWithPairs(ips: IPRecord[]): string[] {
 
-  const result = ips.reduce((acc, value) => {
+  const ipMap = new Map<string, string>();
+  const resultSet = new Map<string, string>();
+
+  ips.forEach((value) => {
     const rootPrefix = calculatePrefix(value.IP);
-    return {...acc, [rootPrefix]: [...(acc[rootPrefix] || []), value.IP]};
-  }, {} as any);
-  
-  return Object.values<string[]>(result).reduce((acc, value) => {
-    if (value.length >= 2) {
-      acc.push(ipRangeToCIDR(value[0], value[0]));
+    const existedValue = ipMap.get(rootPrefix);
+    if (existedValue) {
+      const existInResult = resultSet.get(rootPrefix);
+      if (!existInResult) {
+        resultSet.set(rootPrefix, ipRangeToCIDR(value.IP, value.IP));
+      }
+    } else {
+      ipMap.set(rootPrefix, value.IP);
     }
-    return acc;
-  }, [] as string[]);
+  });
+
+  return Array.from(resultSet.values());
 }
 
 export function saveFile(fileName: string, text: string): void {
