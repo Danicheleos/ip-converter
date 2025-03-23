@@ -59,10 +59,12 @@ nextjs-portal, next-route-announcer {
   display: flex;
   justify-content: flex-start;
   margin: 0 auto;
+  border-radius: 5px;
 
   .progress-bar {
     width: 0%;
     background-color: #44d4d9;
+    border-radius: 3px;
   }
 }
 
