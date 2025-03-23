@@ -1,19 +1,10 @@
-import { useRef, useState, useEffect, useCallback } from 'react';
-import { useDropzone } from 'react-dropzone';
-import { ipRangeToCIDR } from './services/ip.service';
+import { useState } from 'react';
 import {
   IPRecord,
-  saveFile,
-  filterWithPairs,
-  filterWithUniqUA,
-  filterWithMultipleUA,
 } from './services/parser.service';
 import { Tab, Tabs } from '@mui/material';
 import ReadFile from './components/read-file';
-import IpToCidr from './components/ip-to-cidr';
-import DuplicatedIps from './components/duplicated-ips';
-import SingleUA from './components/single-ua';
-import MultipleUA from './components/multiple-ua';
+import ParsingData from './components/parsing-data';
 
 const App: React.FC = () => {
   const [data, setData] = useState<IPRecord[]>([]);
@@ -64,20 +55,21 @@ const App: React.FC = () => {
             reset={reset}
             onLoadFile={setData}
             onLoading={setLoading}
+            loading={loading}
             fileNameChange={setFileName}></ReadFile>
-          {data.length > 0 && !loading && (
+          {data.length > 0 && (
             <>
               {tab === 0 && (
-                <IpToCidr fileName={fileName} data={data}></IpToCidr>
+                <ParsingData fileName={fileName} data={data} scriptPath='../workers/ip-to-cidr-worker.ts' onLoading={setLoading}></ParsingData>
               )}
               {tab === 1 && (
-                <DuplicatedIps fileName={fileName} data={data}></DuplicatedIps>
+                <ParsingData fileName={fileName} data={data} scriptPath='../workers/duplicated-ips-worker.ts' onLoading={setLoading}></ParsingData>
               )}
               {tab === 2 && (
-                <SingleUA fileName={fileName} data={data}></SingleUA>
+                <ParsingData fileName={fileName} data={data} scriptPath='../workers/single-ua-worker.ts' onLoading={setLoading}></ParsingData>
               )}
               {tab === 3 && (
-                <MultipleUA fileName={fileName} data={data}></MultipleUA>
+                <ParsingData fileName={fileName} data={data} scriptPath='../workers/multiple-ua-worker.ts' countUA={true} onLoading={setLoading}></ParsingData>
               )}
             </>
           )}

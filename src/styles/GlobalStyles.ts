@@ -232,7 +232,7 @@ nextjs-portal, next-route-announcer {
 
   .right-side,
   .left-side {
-    max-width: 40%;
+    min-width: 40%;
     flex: 1;
 
     .right-side-header,

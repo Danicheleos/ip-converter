@@ -30,7 +30,7 @@ export function parseCSV(lines: string[], headers: string[], separator: string):
     return sortedIps;
 }
 
-function calculatePrefix(ip: string): string {
+export function calculatePrefix(ip: string): string {
   const isIPv6 = Address6.isValid(ip);
   if (isIPv6) {
     return ip.split(':').slice(0, -1).join();

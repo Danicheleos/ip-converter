@@ -2,7 +2,13 @@ import { useRef, useState, useEffect, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { IPRecord } from '../services/parser.service';
 
-const ReadFile: React.FC<{reset: boolean, onLoadFile: Function, onLoading: Function, fileNameChange: Function}> = ({reset, onLoadFile, onLoading, fileNameChange}) => {
+const ReadFile: React.FC<{
+  reset: boolean;
+  onLoadFile: Function;
+  onLoading: Function;
+  fileNameChange: Function;
+  loading: boolean;
+}> = ({ reset, onLoadFile, onLoading, fileNameChange, loading }) => {
   const parsedData = useRef<IPRecord[]>([]);
   const progress = useRef<number>(0);
   const totalSize = useRef<number>(0);
@@ -10,7 +16,7 @@ const ReadFile: React.FC<{reset: boolean, onLoadFile: Function, onLoading: Funct
   const workerRef = useRef<Worker | null>(null);
 
   const [fileName, setFileName] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
+  const [complete, setComplete] = useState<boolean>(false);
 
   useEffect(() => {
     parsedData.current = [];
@@ -19,7 +25,7 @@ const ReadFile: React.FC<{reset: boolean, onLoadFile: Function, onLoading: Funct
       new URL('../workers/read-worker.ts', import.meta.url),
       { type: 'module' }
     );
-    
+
     workerRef.current.onmessage = (e) => {
       progress.current = e.data.size + progress.current;
       parsedData.current = [...parsedData.current, ...e.data.data];
@@ -33,8 +39,8 @@ const ReadFile: React.FC<{reset: boolean, onLoadFile: Function, onLoading: Funct
       }
       if (percentage === 100) {
         onLoadFile(parsedData.current);
-        setLoading(false);
         onLoading(false);
+        setComplete(true);
       }
     };
 
@@ -44,8 +50,8 @@ const ReadFile: React.FC<{reset: boolean, onLoadFile: Function, onLoading: Funct
   }, [reset]);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
-    setLoading(true);
     onLoading(true);
+    setComplete(false);
     totalSize.current = acceptedFiles[0].size;
 
     let firstLine = true;
@@ -100,7 +106,8 @@ const ReadFile: React.FC<{reset: boolean, onLoadFile: Function, onLoading: Funct
   });
 
   const onReset = () => {
-    setLoading(false);
+    onLoading(false);
+    setComplete(true);
     parsedData.current = [];
     progress.current = 0;
     totalSize.current = 0;
@@ -114,41 +121,40 @@ const ReadFile: React.FC<{reset: boolean, onLoadFile: Function, onLoading: Funct
   };
   return (
     <>
-          {fileName && (
-            <>
-              <span className={'fileName'}>{fileName}</span>
-              <span className={`${'fileName'} ${'controls'}`}>
-                {!loading && (
-                  <button onClick={onReset} className={'controls'} disabled={loading}>
-                    <span>RESET</span>
-                  </button>
-                )}
-              </span>
-            </>
-          )}
+      {fileName && (
+        <>
+          <span className={'fileName'}>{fileName}</span>
+          <span className={`${'fileName'} ${'controls'}`}>
+              <button
+                onClick={onReset}
+                className={'controls'}
+                disabled={loading}>
+                <span>RESET</span>
+              </button>
+          </span>
+        </>
+      )}
 
-          {loading && (
-            <>
-              <span style={{margin: 'auto'}}>
-                Wait a minute...
-              </span>
-              <div className='progress-bar-wrapper'>
-                <div className='progress-bar' id='progress-bar'></div>
-              </div>
-            </>
+      {!complete && loading  && (
+        <>
+          <span style={{ margin: 'auto' }}>Wait a minute...</span>
+          <div className='progress-bar-wrapper'>
+            <div className='progress-bar' id='progress-bar'></div>
+          </div>
+        </>
+      )}
+      {!loading && parsedData.current.length === 0 && (
+        <div
+          className={`${'dropzone'} ${isDragActive ? 'over' : ''}`}
+          {...getRootProps()}>
+          <input {...getInputProps()} />
+          {isDragActive ? (
+            <p>Drop the files here ...</p>
+          ) : (
+            <p>Drag and drop some file here, or click to select file</p>
           )}
-          {!loading && parsedData.current.length === 0 && (
-            <div
-              className={`${'dropzone'} ${isDragActive ? 'over' : ''}`}
-              {...getRootProps()}>
-              <input {...getInputProps()} />
-              {isDragActive ? (
-                <p>Drop the files here ...</p>
-              ) : (
-                <p>Drag and drop some file here, or click to select file</p>
-              )}
-            </div>
-          )}
+        </div>
+      )}
     </>
   );
 };
