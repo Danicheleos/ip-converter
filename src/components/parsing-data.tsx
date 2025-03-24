@@ -61,7 +61,7 @@ const ParsingData: React.FC<{
 
       <div className='result-wrapper'>
         <div className='left-side'>
-          <div className='left-side-header'>Загружаемный Файл</div>
+          <div className='left-side-header'>Input File</div>
           <div className='left-side-container'>
             {data.slice(0, 20).map((value, index) => (
               <div key={'l' + index} className='preview'>
@@ -96,7 +96,7 @@ const ParsingData: React.FC<{
         </div>
 
         <div className='right-side'>
-          <div className='right-side-header'>Исходящий Файл</div>
+          <div className='right-side-header'>Output File</div>
           <div className='right-side-container'>
             {parsedDataResult.slice(0, 20).map((value, index) => (
               <div key={'r' + index} className='preview'>

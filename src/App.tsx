@@ -30,22 +30,22 @@ const App: React.FC = () => {
         <main className={'main'}>
           <Tabs value={tab} onChange={changeTab} centered variant='fullWidth'>
             <Tab
-              label='Конвертировать IP в IP Range'
+              label='Convert IP to IP Range'
               value={0}
               disabled={loading}
             />
             <Tab
-              label='Сделать выборку по 2 и более адресов в последнем разряде'
+              label='Select IPs with pairs by last segment and convert to IP Range'
               value={1}
               disabled={loading}
             />
             <Tab
-              label='Выбрать IP только с 1 UA на IP'
+              label='Select IPs with a single User Agent'
               value={2}
               disabled={loading}
             />
             <Tab
-              label='Выбрать IP с несколькими UA на IP'
+              label='Select IPs with N+ User Agents'
               value={3}
               disabled={loading}
             />
