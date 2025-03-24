@@ -81,6 +81,7 @@ nextjs-portal, next-route-announcer {
   font-family: var(--font-geist-sans);
 }
 
+
 @media (prefers-color-scheme: dark) {
   .page {
     --gray-rgb: 255, 255, 255;
@@ -89,6 +90,12 @@ nextjs-portal, next-route-announcer {
 
     --button-primary-hover: #ccc;
     --button-secondary-hover: #1a1a1a;
+
+    .MuiTabs-list {
+      .MuiTab-root {
+        color: white;
+      }
+    }
   }
 }
 
@@ -188,7 +195,6 @@ nextjs-portal, next-route-announcer {
   width: 100%;
 
   .MuiTab-root {
-    color: white;
     cursor: pointer;
 
     &.Mui-selected {
