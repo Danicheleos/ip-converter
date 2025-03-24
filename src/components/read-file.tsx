@@ -82,7 +82,7 @@ const ReadFile: React.FC<{
           lines.push(suffix);
           suffix = '';
         }
-        
+
         if (workerRef.current) {
           workerRef.current.postMessage({
             lines,

@@ -4,19 +4,47 @@ import { IPRecord, saveFile } from '../services/parser.service';
 const ParsingData: React.FC<{
   data: IPRecord[];
   fileName: string;
-  scriptPath: string;
-  countUA?: boolean;
+  tab?: number;
   onLoading: Function;
-}> = ({ data, fileName, scriptPath, countUA, onLoading }) => {
+}> = ({ data, fileName, tab, onLoading }) => {
   const [parsedDataResult, setParsedDataResult] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [maxUA, setMaxUA] = useState<number>(0);
   const workerRef = useRef<Worker | null>(null);
 
   useEffect(() => {
-    workerRef.current = new Worker(new URL(scriptPath, import.meta.url), {
-      type: 'module',
-    });
+    if (tab === 1) {
+      workerRef.current = new Worker(
+        new URL('../workers/duplicated-ips-worker.ts', import.meta.url),
+        {
+          type: 'module',
+        }
+      );
+    }
+
+    if (tab === 2) {
+      workerRef.current = new Worker(
+        new URL('../workers/single-ua-worker.ts', import.meta.url),
+        {
+          type: 'module',
+        }
+      );
+    }
+    if (tab === 3) {
+      workerRef.current = new Worker(
+        new URL('../workers/multiple-ua-worker.ts', import.meta.url),
+        {
+          type: 'module',
+        }
+      );
+    }
+
+    workerRef.current = new Worker(
+      new URL('../workers/ip-to-cidr-worker.ts', import.meta.url),
+      {
+        type: 'module',
+      }
+    );
 
     workerRef.current.onmessage = (e) => {
       const { type, data } = e.data;
@@ -73,7 +101,7 @@ const ParsingData: React.FC<{
         </div>
         <div className='parse-controls controls'>
           <div>
-            {countUA && (
+            {tab === 3 && (
               <div>
                 <label>Количество UA</label>
                 <input

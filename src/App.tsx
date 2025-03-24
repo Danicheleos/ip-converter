@@ -60,16 +60,16 @@ const App: React.FC = () => {
           {data.length > 0 && (
             <>
               {tab === 0 && (
-                <ParsingData fileName={fileName} data={data} scriptPath='../workers/ip-to-cidr-worker.ts' onLoading={setLoading}></ParsingData>
+                <ParsingData tab={tab} fileName={fileName} data={data} onLoading={setLoading}></ParsingData>
               )}
               {tab === 1 && (
-                <ParsingData fileName={fileName} data={data} scriptPath='../workers/duplicated-ips-worker.ts' onLoading={setLoading}></ParsingData>
+                <ParsingData tab={tab} fileName={fileName} data={data} onLoading={setLoading}></ParsingData>
               )}
               {tab === 2 && (
-                <ParsingData fileName={fileName} data={data} scriptPath='../workers/single-ua-worker.ts' onLoading={setLoading}></ParsingData>
+                <ParsingData tab={tab} fileName={fileName} data={data} onLoading={setLoading}></ParsingData>
               )}
               {tab === 3 && (
-                <ParsingData fileName={fileName} data={data} scriptPath='../workers/multiple-ua-worker.ts' countUA={true} onLoading={setLoading}></ParsingData>
+                <ParsingData tab={tab} fileName={fileName} data={data} onLoading={setLoading}></ParsingData>
               )}
             </>
           )}
