@@ -4,7 +4,8 @@ import { IPRecord, saveFile } from '../services/parser.service';
 const ParsingData: React.FC<{
   data: IPRecord[];
   fileName: string;
-  tab?: number;
+  tab: number;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   onLoading: Function;
 }> = ({ data, fileName, tab, onLoading }) => {
   const [parsedDataResult, setParsedDataResult] = useState<string[]>([]);
@@ -13,6 +14,15 @@ const ParsingData: React.FC<{
   const workerRef = useRef<Worker | null>(null);
 
   useEffect(() => {
+    if (tab === 0) {
+      workerRef.current = new Worker(
+        new URL('../workers/ip-to-cidr-worker.ts', import.meta.url),
+        {
+          type: 'module',
+        }
+      );
+    }
+
     if (tab === 1) {
       workerRef.current = new Worker(
         new URL('../workers/duplicated-ips-worker.ts', import.meta.url),
@@ -39,32 +49,27 @@ const ParsingData: React.FC<{
       );
     }
 
-    workerRef.current = new Worker(
-      new URL('../workers/ip-to-cidr-worker.ts', import.meta.url),
-      {
-        type: 'module',
-      }
-    );
-
-    workerRef.current.onmessage = (e) => {
-      const { type, data } = e.data;
-      if (type === 'result') {
-        setParsedDataResult(data);
-        setLoading(false);
-        onLoading(false);
-      }
-      if (type === 'progress') {
-        const progressBar = document.getElementById('progress-bar');
-        if (progressBar) {
-          progressBar.style.width = data.toString() + '%';
+    if (workerRef.current) {
+      workerRef.current.onmessage = (e) => {
+        const { type, data } = e.data;
+        if (type === 'result') {
+          setParsedDataResult(data);
+          setLoading(false);
+          onLoading(false);
         }
-      }
-    };
+        if (type === 'progress') {
+          const progressBar = document.getElementById('progress-bar');
+          if (progressBar) {
+            progressBar.style.width = data.toString() + '%';
+          }
+        }
+      };
+    }
 
     return () => {
       workerRef.current?.terminate();
     };
-  }, []);
+  }, [tab]);
 
   const parseData = () => {
     setLoading(true);
