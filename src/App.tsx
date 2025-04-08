@@ -6,10 +6,12 @@ import ParsingData from './components/parsing-data';
 
 const App: React.FC = () => {
   const [data, setData] = useState<IPRecord[]>([]);
+  const [dataSecond, setDataSecond] = useState<IPRecord[]>([]);
 
   const [reset, setReset] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [fileName, setFileName] = useState<string>('');
+  const [fileNameSecond, setFileNameSecond] = useState<string>('');
   const [tab, setTab] = useState<number>(0);
 
   const onReset = () => {
@@ -55,13 +57,29 @@ const App: React.FC = () => {
               disabled={loading}
             />
           </Tabs>
+          <div style={{ display: 'flex', gap: 20, justifyContent: 'center' }}>
+            <div style={{ display: 'flex', width: '100%', flex: 1, justifyContent: 'center' }}>
+              <ReadFile
+                label='File 1'
+                reset={reset}
+                onLoadFile={setData}
+                onLoading={setLoading}
+                loading={loading}
+                fileNameChange={setFileName}></ReadFile>
+            </div>
+            {tab === 5 && (
+              <div style={{ display: 'flex', width: '100%', flex: 1,  justifyContent: 'center' }}>
+                <ReadFile
+                  label='File 2'
+                  reset={reset}
+                  onLoadFile={setDataSecond}
+                  onLoading={setLoading}
+                  loading={loading}
+                  fileNameChange={setFileNameSecond}></ReadFile>
+              </div>
+            )}
+          </div>
 
-          <ReadFile
-            reset={reset}
-            onLoadFile={setData}
-            onLoading={setLoading}
-            loading={loading}
-            fileNameChange={setFileName}></ReadFile>
           {data.length > 0 && (
             <>
               {tab === 0 && (
@@ -99,10 +117,11 @@ const App: React.FC = () => {
                   data={data}
                   onLoading={setLoading}></ParsingData>
               )}
-              {tab === 5 && (
+              {tab === 5 && !!data.length && !!dataSecond.length && (
                 <ParsingData
                   tab={tab}
-                  fileName={fileName}
+                  fileName={fileNameSecond}
+                  dataSecond={dataSecond}
                   data={data}
                   onLoading={setLoading}></ParsingData>
               )}

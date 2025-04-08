@@ -4,12 +4,13 @@ import { useDropzone } from 'react-dropzone';
 import { IPRecord } from '../services/parser.service';
 
 const ReadFile: React.FC<{
+  label?: string;
   reset: boolean;
   onLoadFile: Function;
   onLoading: Function;
   fileNameChange: Function;
   loading: boolean;
-}> = ({ reset, onLoadFile, onLoading, fileNameChange, loading }) => {
+}> = ({ label, reset, onLoadFile, onLoading, fileNameChange, loading }) => {
   const parsedData = useRef<IPRecord[]>([]);
   const progress = useRef<number>(0);
   const totalSize = useRef<number>(0);
@@ -127,40 +128,45 @@ const ReadFile: React.FC<{
   };
   return (
     <>
-      {fileName && (
-        <>
-          <span className={'fileName'}>{fileName}</span>
-          <span className={`${'fileName'} ${'controls'}`}>
+      <div>
+        <div style={{ marginBottom: 10 }}>
+          <span className={'fileName'}>{label}</span>
+        </div>
+        {fileName && (
+          <>
+            <span className={'fileName'} >{fileName}</span>
+            <span className={`${'fileName'} ${'controls'}`} style={{ marginTop: 10 }}>
               <button
                 onClick={onReset}
                 className={'controls'}
                 disabled={loading}>
                 <span>RESET</span>
               </button>
-          </span>
-        </>
-      )}
+            </span>
+          </>
+        )}
 
-      {!complete && loading  && (
-        <>
-          <span style={{ margin: 'auto' }}>Wait a minute...</span>
-          <div className='progress-bar-wrapper'>
-            <div className='progress-bar' id='progress-bar'></div>
+        {!complete && loading && (
+          <>
+            <span style={{ margin: 'auto' }}>Wait a minute...</span>
+            <div className='progress-bar-wrapper'>
+              <div className='progress-bar' id='progress-bar'></div>
+            </div>
+          </>
+        )}
+        {!loading && parsedData.current.length === 0 && (
+          <div
+            className={`${'dropzone'} ${isDragActive ? 'over' : ''}`}
+            {...getRootProps()}>
+            <input {...getInputProps()} />
+            {isDragActive ? (
+              <p>Drop the files here ...</p>
+            ) : (
+              <p>Drag and drop some file here, or click to select file</p>
+            )}
           </div>
-        </>
-      )}
-      {!loading && parsedData.current.length === 0 && (
-        <div
-          className={`${'dropzone'} ${isDragActive ? 'over' : ''}`}
-          {...getRootProps()}>
-          <input {...getInputProps()} />
-          {isDragActive ? (
-            <p>Drop the files here ...</p>
-          ) : (
-            <p>Drag and drop some file here, or click to select file</p>
-          )}
-        </div>
-      )}
+        )}
+      </div>
     </>
   );
 };

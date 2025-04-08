@@ -18,7 +18,7 @@ export function parseCSV(lines: string[], headers: string[], separator: string):
     const result = lines.map((line) => {
       return match(line).reduce((acc, cur, i) => {
         const key = heads[i] ?? `${i}`;
-        if (key !== 'USER_AGENT' && key !== 'IP' && key !== 'EVENT_TYPE' && key !== 'CONVERTED_AMOUNT') return acc;
+        if (key !== 'USER_AGENT' && key !== 'IP' && key !== 'EVENT_TYPE' && key !== 'CONVERTED_AMOUNT' && key !== 'DEPOSIT_AMOUNT') return acc;
   
         const val = cur.length <= 0 ? null : Number(cur) || cur;
         return { ...acc, [key.trim()]: val };

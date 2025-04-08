@@ -4,10 +4,11 @@ import { IPRecord, saveFile } from '../services/parser.service';
 const ParsingData: React.FC<{
   data: IPRecord[];
   fileName: string;
+  dataSecond?: IPRecord[];
   tab: number;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   onLoading: Function;
-}> = ({ data, fileName, tab, onLoading }) => {
+}> = ({ data, fileName, dataSecond, tab, onLoading }) => {
   const [parsedDataResult, setParsedDataResult] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [minValue, setMinValue] = useState<number>(0);
@@ -51,7 +52,15 @@ const ParsingData: React.FC<{
     }
     if (tab === 4) {
       workerRef.current = new Worker(
-        new URL('../workers/deposited.ts', import.meta.url),
+        new URL('../workers/deposited.worker.ts', import.meta.url),
+        {
+          type: 'module',
+        }
+      );
+    }
+    if (tab === 5) {
+      workerRef.current = new Worker(
+        new URL('../workers/compare-deposites.worker.ts', import.meta.url),
         {
           type: 'module',
         }
@@ -59,7 +68,7 @@ const ParsingData: React.FC<{
     }
     if (tab === 6) {
       workerRef.current = new Worker(
-        new URL('../workers/overclicked.ts', import.meta.url),
+        new URL('../workers/overclicked.worker.ts', import.meta.url),
         {
           type: 'module',
         }
@@ -98,7 +107,19 @@ const ParsingData: React.FC<{
         break;
       }
       case 4: {
-        workerRef.current?.postMessage({ data, minValue, maxValue: maxValue || 1000000 });
+        workerRef.current?.postMessage({
+          data,
+          minValue,
+          maxValue: maxValue || 1000000,
+        });
+        break;
+      }
+      case 5: {
+        workerRef.current?.postMessage({
+          data,
+          dataSecond,
+          minValue,
+        });
         break;
       }
       case 6: {
@@ -127,15 +148,36 @@ const ParsingData: React.FC<{
 
       <div className='result-wrapper'>
         <div className='left-side'>
-          <div className='left-side-header'>Input File | {data.length} lines</div>
-          <div className='left-side-container'>
-            {data.slice(0, 20).map((value, index) => (
-              <div key={'l' + index} className='preview'>
-                <span className='ip'>{value.IP}</span>
-                <span className='ua'>{value.USER_AGENT}</span>
+          {data.length && (
+            <div>
+              <div className='left-side-header'>
+                Input File 1 | {data.length} lines
               </div>
-            ))}
-          </div>
+              <div className='left-side-container'>
+                {data.slice(0, 20).map((value, index) => (
+                  <div key={'l' + index} className='preview'>
+                    <span className='ip'>{value.IP}</span>
+                    <span className='ua'>{value.USER_AGENT}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {!!dataSecond?.length && (
+            <div style={{ marginTop: 20 }}>
+              <div className='left-side-header'>
+                Input File 2 | {dataSecond.length} lines
+              </div>
+              <div className='left-side-container'>
+                {dataSecond.slice(0, 20).map((value, index) => (
+                  <div key={'l' + index} className='preview'>
+                    <span className='ip'>{value.IP}</span>
+                    <span className='ua'>{value.USER_AGENT}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
         <div className='parse-controls controls'>
           <div>
@@ -176,6 +218,19 @@ const ParsingData: React.FC<{
                 </div>
               </>
             )}
+            {tab === 5 && (
+              <div>
+                <label>Min IP Amount</label>
+                <input
+                  value={minValue}
+                  onChange={(e) => setMinValue(+e.target.value)}
+                  min='0'
+                  max='10000'
+                  type='number'
+                  disabled={loading}
+                  placeholder='Min Events Amount'></input>
+              </div>
+            )}
             {tab === 6 && (
               <div>
                 <label>Min Events Amount</label>
@@ -201,9 +256,11 @@ const ParsingData: React.FC<{
         </div>
 
         <div className='right-side'>
-          <div className='right-side-header'>Output File | {parsedDataResult.length} lines</div>
+          <div className='right-side-header'>
+            Output File | {parsedDataResult.length} lines
+          </div>
           <div className='right-side-container'>
-            {parsedDataResult.slice(0, 20).map((value, index) => (
+            {parsedDataResult.slice(0, tab === 5 ? 40 : 20).map((value, index) => (
               <div key={'r' + index} className='preview'>
                 <span className='ip'>{value}</span>
               </div>
