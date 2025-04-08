@@ -98,7 +98,7 @@ const ParsingData: React.FC<{
         break;
       }
       case 4: {
-        workerRef.current?.postMessage({ data, minValue, maxValue });
+        workerRef.current?.postMessage({ data, minValue, maxValue: maxValue || 1000000 });
         break;
       }
       case 6: {
