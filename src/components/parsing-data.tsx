@@ -10,7 +10,8 @@ const ParsingData: React.FC<{
 }> = ({ data, fileName, tab, onLoading }) => {
   const [parsedDataResult, setParsedDataResult] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [maxUA, setMaxUA] = useState<number>(0);
+  const [minValue, setMinValue] = useState<number>(0);
+  const [maxValue, setMaxValue] = useState<number>(0);
   const workerRef = useRef<Worker | null>(null);
 
   useEffect(() => {
@@ -48,6 +49,22 @@ const ParsingData: React.FC<{
         }
       );
     }
+    if (tab === 4) {
+      workerRef.current = new Worker(
+        new URL('../workers/deposited.ts', import.meta.url),
+        {
+          type: 'module',
+        }
+      );
+    }
+    if (tab === 6) {
+      workerRef.current = new Worker(
+        new URL('../workers/overclicked.ts', import.meta.url),
+        {
+          type: 'module',
+        }
+      );
+    }
 
     if (workerRef.current) {
       workerRef.current.onmessage = (e) => {
@@ -74,7 +91,23 @@ const ParsingData: React.FC<{
   const parseData = () => {
     setLoading(true);
     onLoading(true);
-    workerRef.current?.postMessage({ data, maxUA });
+
+    switch (tab) {
+      case 3: {
+        workerRef.current?.postMessage({ data, minValue });
+        break;
+      }
+      case 4: {
+        workerRef.current?.postMessage({ data, minValue, maxValue });
+        break;
+      }
+      case 6: {
+        workerRef.current?.postMessage({ data, minValue });
+        break;
+      }
+      default:
+        workerRef.current?.postMessage({ data });
+    }
   };
 
   const onExport = (): void => {
@@ -94,7 +127,7 @@ const ParsingData: React.FC<{
 
       <div className='result-wrapper'>
         <div className='left-side'>
-          <div className='left-side-header'>Input File</div>
+          <div className='left-side-header'>Input File | {data.length} lines</div>
           <div className='left-side-container'>
             {data.slice(0, 20).map((value, index) => (
               <div key={'l' + index} className='preview'>
@@ -108,13 +141,52 @@ const ParsingData: React.FC<{
           <div>
             {tab === 3 && (
               <div>
-                <label>Количество UA</label>
+                <label>Min UA amount</label>
                 <input
-                  value={maxUA}
-                  onChange={(e) => setMaxUA(+e.target.value)}
+                  value={minValue}
+                  onChange={(e) => setMinValue(+e.target.value)}
                   type='number'
                   disabled={loading}
                   placeholder='Количество UA'></input>
+              </div>
+            )}
+            {tab === 4 && (
+              <>
+                <div>
+                  <label>Min Deposite</label>
+                  <input
+                    value={minValue}
+                    onChange={(e) => setMinValue(+e.target.value)}
+                    min='0'
+                    max='1000000'
+                    type='number'
+                    disabled={loading}
+                    placeholder='Min Deposite'></input>
+                </div>
+                <div>
+                  <label>Max Deposite</label>
+                  <input
+                    value={maxValue}
+                    onChange={(e) => setMaxValue(+e.target.value)}
+                    type='number'
+                    min='0'
+                    max='1000000'
+                    disabled={loading}
+                    placeholder='Max Deposite'></input>
+                </div>
+              </>
+            )}
+            {tab === 6 && (
+              <div>
+                <label>Min Events Amount</label>
+                <input
+                  value={minValue}
+                  onChange={(e) => setMinValue(+e.target.value)}
+                  min='0'
+                  max='10000'
+                  type='number'
+                  disabled={loading}
+                  placeholder='Min Events Amount'></input>
               </div>
             )}
             <button onClick={parseData} disabled={loading}>
@@ -129,7 +201,7 @@ const ParsingData: React.FC<{
         </div>
 
         <div className='right-side'>
-          <div className='right-side-header'>Output File</div>
+          <div className='right-side-header'>Output File | {parsedDataResult.length} lines</div>
           <div className='right-side-container'>
             {parsedDataResult.slice(0, 20).map((value, index) => (
               <div key={'r' + index} className='preview'>

@@ -1,7 +1,5 @@
 import { useState } from 'react';
-import {
-  IPRecord,
-} from './services/parser.service';
+import { IPRecord } from './services/parser.service';
 import { Tab, Tabs } from '@mui/material';
 import ReadFile from './components/read-file';
 import ParsingData from './components/parsing-data';
@@ -29,11 +27,7 @@ const App: React.FC = () => {
       <div className={`page variable `}>
         <main className={'main'}>
           <Tabs value={tab} onChange={changeTab} centered variant='fullWidth'>
-            <Tab
-              label='Convert IP to IP Range'
-              value={0}
-              disabled={loading}
-            />
+            <Tab label='Convert IP to IP Range' value={0} disabled={loading} />
             <Tab
               label='Select IPs with pairs by last segment and convert to IP Range'
               value={1}
@@ -49,6 +43,17 @@ const App: React.FC = () => {
               value={3}
               disabled={loading}
             />
+            <Tab
+              label='Select IPs with Deposited Users'
+              value={4}
+              disabled={loading}
+            />
+            <Tab label='Select IPs without Dep' value={5} disabled={loading} />
+            <Tab
+              label='Select overclicked/impressed IP'
+              value={6}
+              disabled={loading}
+            />
           </Tabs>
 
           <ReadFile
@@ -60,16 +65,53 @@ const App: React.FC = () => {
           {data.length > 0 && (
             <>
               {tab === 0 && (
-                <ParsingData tab={tab} fileName={fileName} data={data} onLoading={setLoading}></ParsingData>
+                <ParsingData
+                  tab={tab}
+                  fileName={fileName}
+                  data={data}
+                  onLoading={setLoading}></ParsingData>
               )}
               {tab === 1 && (
-                <ParsingData tab={tab} fileName={fileName} data={data} onLoading={setLoading}></ParsingData>
+                <ParsingData
+                  tab={tab}
+                  fileName={fileName}
+                  data={data}
+                  onLoading={setLoading}></ParsingData>
               )}
               {tab === 2 && (
-                <ParsingData tab={tab} fileName={fileName} data={data} onLoading={setLoading}></ParsingData>
+                <ParsingData
+                  tab={tab}
+                  fileName={fileName}
+                  data={data}
+                  onLoading={setLoading}></ParsingData>
               )}
               {tab === 3 && (
-                <ParsingData tab={tab} fileName={fileName} data={data} onLoading={setLoading}></ParsingData>
+                <ParsingData
+                  tab={tab}
+                  fileName={fileName}
+                  data={data}
+                  onLoading={setLoading}></ParsingData>
+              )}
+              {tab === 4 && (
+                <ParsingData
+                  tab={tab}
+                  fileName={fileName}
+                  data={data}
+                  onLoading={setLoading}></ParsingData>
+              )}
+              {tab === 5 && (
+                <ParsingData
+                  tab={tab}
+                  fileName={fileName}
+                  data={data}
+                  onLoading={setLoading}></ParsingData>
+              )}
+              {tab === 6 && (
+                <ParsingData
+                  tab={tab}
+                  fileName={fileName}
+                  data={data}
+                  onLoading={setLoading}></ParsingData>
               )}
             </>
           )}

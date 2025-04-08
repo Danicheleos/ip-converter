@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { IPRecord } from '../services/parser.service';

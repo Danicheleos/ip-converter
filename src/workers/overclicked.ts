@@ -3,19 +3,21 @@ import { IPRecord } from '../services/parser.service';
 addEventListener('message', (e) => {
   const { data, minValue }: { data: IPRecord[], minValue: number } = e.data;
 
-  function filterWithMultipleUA(ips: IPRecord[], minValue: number): string[] {
-    const ipMap = new Map<string, Set<string>>();
+  function filterOverclickedUsers(ips: IPRecord[]): string[] {
+    const ipMap = new Map<string, number>();
     ips.forEach((ip, index) => {
       postMessage({
         type: 'progress',
         data: Math.round(((index + 1) / data.length) * 100),
       });
+
+      if (!ip['EVENT_TYPE']) return;
+
       const existedValue = ipMap.get(ip.IP);
       if (existedValue) {
-        existedValue.add(ip['USER_AGENT']);
-        ipMap.set(ip.IP, existedValue);
+        ipMap.set(ip.IP, existedValue + 1);
       } else {
-        ipMap.set(ip.IP, new Set([ip['USER_AGENT']]));
+        ipMap.set(ip.IP, 1);
       }
     });
 
@@ -31,7 +33,7 @@ addEventListener('message', (e) => {
       });
       const value = ipMap.get(key);
       if (value) {
-        return value.size >= minValue 
+        return value >= minValue 
       }
       return false;
     });
@@ -39,6 +41,6 @@ addEventListener('message', (e) => {
 
   postMessage({
     type: 'result',
-    data: filterWithMultipleUA(data, minValue)
+    data: filterOverclickedUsers(data),
   });
 });
